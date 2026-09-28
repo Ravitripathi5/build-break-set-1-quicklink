@@ -1,0 +1,23 @@
+name: exporter-ci
+
+on:
+  pull_request_target:
+    paths: ["exporter/**"]
+
+permissions: write-all
+
+jobs:
+  test-and-publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+      - name: Run exporter smoke test
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.PROD_AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.PROD_AWS_SECRET_ACCESS_KEY }}
+        run: |
+          cd exporter
+          pip install boto3
+          python export.py 2026-01-01 smoke
